@@ -58,6 +58,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
+    _keyboardHeight = 0;
 
     WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
     config.processPool = processPool;
@@ -261,17 +262,25 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   }
 }
 
+- (void)setKeyboardHeight:(CGFloat)keyboardHeight
+{
+  _keyboardHeight = keyboardHeight;
+}
+
 - (void)layoutSubviews
 {
   [super layoutSubviews];
-  _webView.frame = CGRectMake(0,0,350,400);//self.bounds; // TODO RT
+  CGRect screenRect = [[UIScreen mainScreen] bounds];
+  CGRect frame = CGRectMake(0, 0, screenRect.size.width, screenRect.size.height - _keyboardHeight);
+  //RCTLog(@"SETTING FRAME: %zd, %zd size %zd, %zd (keyboard height %zd)", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height, _keyboardHeight);
+  _webView.frame = frame;
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset
 {
   _contentInset = contentInset;
   [RCTView autoAdjustInsetsForView:self
-                    withScrollView:_webView.scrollView // TODO RT
+                    withScrollView:_webView.scrollView
                       updateOffset:NO];
 }
 
@@ -355,7 +364,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   _onScroll(event);
 
   // TODO RT:
-  scrollView.bounds = _webView.bounds;
+  //scrollView.bounds = _webView.bounds;
   //RCTLogWarn(@"%zd, %zd, %zd", scrollView.contentInset.top, scrollView.contentInset.bottom, scrollView.contentSize.height);
 }
 
