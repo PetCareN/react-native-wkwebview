@@ -279,6 +279,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)keyboardWillShow:(NSNotification *)notification
 {
   _keyboardShowing = true;
+  _keyboardWillShow = true;
 
   _oldScrollDelegate = _webView.scrollView.delegate;
   _oldOffset = _webView.scrollView.contentOffset;
@@ -294,6 +295,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)keyboardDidShow:(NSNotification *)notification
 {
   _keyboardShowing = true;
+  _keyboardWillShow = false;
 
   _webView.scrollView.delegate = _oldScrollDelegate;
 
@@ -315,7 +317,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-  if (_keyboardShowing) {
+  if (_keyboardWillShow) {
     scrollView.contentOffset = _oldOffset;
   }
 }
@@ -324,6 +326,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)keyboardWillHide:(NSNotification *)notification
 {
   _keyboardShowing = false;
+  _keyboardWillShow = false;
   //CGRect screenRect = [[UIScreen mainScreen] bounds];
   //CGRect frame = CGRectMake(0, 0, 375, 435);
   //CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, screenRect.size.height);
