@@ -279,25 +279,40 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)keyboardWillShow:(NSNotification *)notification
 {
   _keyboardShowing = true;
-  CGRect screenRect = [[UIScreen mainScreen] bounds];
-  CGRect frame = CGRectMake(0, 0, 375, 400);
+  //CGRect screenRect = [[UIScreen mainScreen] bounds];
+  //CGRect frame = CGRectMake(0, 0, 375, 435);
   //CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, screenRect.size.height - _keyboardHeight);
-  _webView.frame = frame;
+  //_webView.frame = frame;
   //_webView.bounds = frame;
 }
 
 - (void)keyboardDidShow:(NSNotification *)notification
 {
   _keyboardShowing = true;
-  CGRect screenRect = [[UIScreen mainScreen] bounds];
-  CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, screenRect.size.height - _keyboardHeight);
+  //CGRect screenRect = [[UIScreen mainScreen] bounds];
+  //CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, screenRect.size.height - _keyboardHeight);
   //_webView.frame = frame;
   //_webView.bounds = frame;
+
+  // https://medium.com/@dzungnguyen.hcm/autolayout-for-scrollview-keyboard-handling-in-ios-5a47d73fd023
+  //_webView.constraintContentHeight.constant = screenRect.size.height - _keyboardHeight;
+  //_webView.scrollView.constraintContentHeight.constant = screenRect.size.height - _keyboardHeight;
+
+  //_webView.scrollView.contentSize=CGSizeMake(screenRect.size.width,screenRect.size.height - _keyboardHeight);
+  //_webView.scrollView.contentInset=UIEdgeInsetsMake(0.0,0.0,0.0,0.0);
+  //_webView.scrollView.scrollIndicatorInsets=UIEdgeInsetsMake(0.0,0.0,0.0,0.0);
+  //RCTLog(@"content size %f x %f; inset bottom %f", _webView.scrollView.contentSize.width, _webView.scrollView.contentSize.height, _webView.scrollView.contentInset.bottom);
+
+  _webView.scrollView.scrollEnabled = false;
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification
 {
   _keyboardShowing = false;
+  //CGRect screenRect = [[UIScreen mainScreen] bounds];
+  //CGRect frame = CGRectMake(0, 0, 375, 435);
+  //CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, screenRect.size.height);
+  //_webView.frame = frame;
 }
 
 - (void)keyboardWillChangeFrame:(NSNotification *)notification
@@ -315,18 +330,24 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   // has all the desired behavior. Must be like.... when the keyboard shows,
   // and the WKWebView is big enough, it adds padding until the keyboard hides,
   // so changing the frame doesn't help?
-  CGRect frame = CGRectMake(0, 0, 375, 400);
+  //CGRect frame = _keyboardShowing ? CGRectMake(0, 0, 375, 435) : CGRectMake(0, 0, screenRect.size.width, screenRect.size.height);
   //CGRect frame = CGRectMake(0, 0, 375, screenRect.size.height - _keyboardHeight - 135);
-  //CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, _keyboardShowing ? screenRect.size.height - _keyboardHeight : screenRect.size.height);
+  CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, _keyboardShowing ? screenRect.size.height - _keyboardHeight : screenRect.size.height);
 
   // Logically we just want frame...
   _webView.frame = frame;
   //_webView.bounds = frame;
   // This is also a possible option, but I think not the right one.
   //_webView.scrollView.bounds = frame;
-  RCTLog(@"BOUNDS: x:%f, y:%f w:%f, h:%f", _webView.bounds.origin.x, _webView.bounds.origin.y, _webView.bounds.size.width, _webView.bounds.size.height);
-  RCTLog(@"FRAME: x:%f, y:%f w:%f, h:%f", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
-  RCTLog(@"desired height: %f screen size - %f keyboard height = %f", screenRect.size.height, _keyboardHeight, screenRect.size.height - _keyboardHeight);
+  //RCTLog(@"BOUNDS: x:%f, y:%f w:%f, h:%f", _webView.bounds.origin.x, _webView.bounds.origin.y, _webView.bounds.size.width, _webView.bounds.size.height);
+  //RCTLog(@"FRAME: x:%f, y:%f w:%f, h:%f", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+  //RCTLog(@"desired height: %f screen size - %f keyboard height = %f", screenRect.size.height, _keyboardHeight, screenRect.size.height - _keyboardHeight);
+
+  /*
+  _webView.scrollView.contentSize=CGSizeMake(320,758);
+  _webView.scrollView.contentInset=UIEdgeInsetsMake(0.0,0.0,0.0,0.0);
+  _webView.scrollView.scrollIndicatorInsets=UIEdgeInsetsMake(0.0,0.0,0.0,0.0);
+  RCTLog(@"content size %f x %f; inset bottom %f", _webView.scrollView.contentSize.width, _webView.scrollView.contentSize.height, _webView.scrollView.contentInset.bottom);*/
 }
 
 // TODO RT: hacks end
