@@ -59,6 +59,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
     _keyboardHeight = 0;
+    _keyboardShowing = false;
 
     WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
     config.processPool = processPool;
@@ -83,6 +84,10 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionNew context:nil];
     [self addSubview:_webView];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
   }
   return self;
 }
@@ -262,19 +267,59 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   }
 }
 
-- (void)setKeyboardHeight:(CGFloat)keyboardHeight
+// TODO RT: hacks begin here
+
+/*- (void)viewDidLoad
 {
-  _keyboardHeight = keyboardHeight;
+  [super viewDidLoad];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
+}*/
+
+- (void)keyboardWillShow:(NSNotification *)notification
+{
+  _keyboardShowing = true;
+  CGRect screenRect = [[UIScreen mainScreen] bounds];
+  CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width,
+                            _keyboardShowing ? screenRect.size.height - _keyboardHeight : screenRect.size.height);
+  _webView.frame = frame;
+  _webView.bounds = frame;
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification
+{
+  _keyboardShowing = false;
+}
+
+- (void)keyboardWillChangeFrame:(NSNotification *)notification
+{
+  _keyboardHeight = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
 }
 
 - (void)layoutSubviews
 {
   [super layoutSubviews];
   CGRect screenRect = [[UIScreen mainScreen] bounds];
-  CGRect frame = CGRectMake(0, 0, screenRect.size.width, screenRect.size.height - _keyboardHeight);
-  //RCTLog(@"SETTING FRAME: %zd, %zd size %zd, %zd (keyboard height %zd)", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height, _keyboardHeight);
+  //CGRect frame = CGRectMake(0, 0, screenRect.size.width, screenRect.size.height - _keyboardHeight);
+
+  // Setting the frame to a set value that wouldn't overlap with the keyboard
+  // has all the desired behavior. Must be like.... when the keyboard shows,
+  // and the WKWebView is big enough, it adds padding until the keyboard hides,
+  // so changing the frame doesn't help?
+  //CGRect frame = CGRectMake(0, 0, 375, 433);
+  CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width,
+                            _keyboardShowing ? screenRect.size.height - _keyboardHeight : screenRect.size.height);
+
+  // Logically we just want frame...
   _webView.frame = frame;
+  //_webView.bounds = frame;
+  // This is also a possible option, but I think not the right one.
+  //_webView.scrollView.bounds = frame;
+  RCTLog(@"BOUNDS: x:%f, y:%f w:%f, h:%f", _webView.bounds.origin.x, _webView.bounds.origin.y, _webView.bounds.size.width, _webView.bounds.size.height);
+  RCTLog(@"FRAME: x:%f, y:%f w:%f, h:%f", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+  RCTLog(@"desired height: %f screen size - %f keyboard height = %f", screenRect.size.height, _keyboardHeight, screenRect.size.height - _keyboardHeight);
 }
+
+// TODO RT: hacks end
 
 - (void)setContentInset:(UIEdgeInsets)contentInset
 {

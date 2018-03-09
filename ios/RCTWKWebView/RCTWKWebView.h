@@ -35,6 +35,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, copy) NSString *injectedJavaScript;
 @property (nonatomic, assign) BOOL hideKeyboardAccessoryView;
 @property (nonatomic, assign) CGFloat keyboardHeight;
+@property (nonatomic, assign) BOOL keyboardShowing;
 
 
 - (void)goForward;
