@@ -36,6 +36,8 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL hideKeyboardAccessoryView;
 @property (nonatomic, assign) CGFloat keyboardHeight;
 @property (nonatomic, assign) BOOL keyboardShowing;
+@property (nonatomic, assign) CGPoint oldOffset;
+@property (nonatomic, assign)id<RCTWKWebViewDelegate> oldScrollDelegate;
 
 
 - (void)goForward;

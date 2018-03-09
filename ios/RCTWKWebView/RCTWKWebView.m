@@ -279,6 +279,11 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)keyboardWillShow:(NSNotification *)notification
 {
   _keyboardShowing = true;
+
+  _oldScrollDelegate = _webView.scrollView.delegate;
+  _oldOffset = _webView.scrollView.contentOffset;
+  _webView.scrollView.delegate = self;
+
   //CGRect screenRect = [[UIScreen mainScreen] bounds];
   //CGRect frame = CGRectMake(0, 0, 375, 435);
   //CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, screenRect.size.height - _keyboardHeight);
@@ -289,6 +294,9 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)keyboardDidShow:(NSNotification *)notification
 {
   _keyboardShowing = true;
+
+  _webView.scrollView.delegate = _oldScrollDelegate;
+
   //CGRect screenRect = [[UIScreen mainScreen] bounds];
   //CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, screenRect.size.height - _keyboardHeight);
   //_webView.frame = frame;
@@ -303,8 +311,13 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   //_webView.scrollView.scrollIndicatorInsets=UIEdgeInsetsMake(0.0,0.0,0.0,0.0);
   //RCTLog(@"content size %f x %f; inset bottom %f", _webView.scrollView.contentSize.width, _webView.scrollView.contentSize.height, _webView.scrollView.contentInset.bottom);
 
-  _webView.scrollView.scrollEnabled = false;
+  //_webView.scrollView.scrollEnabled = false;
 }
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+  scrollView.contentOffset = _oldOffset;
+}
+
 
 - (void)keyboardWillHide:(NSNotification *)notification
 {
@@ -413,7 +426,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   _webView.scrollView.delegate = nil;
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+/*- (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
   NSDictionary *event = @{
                           @"contentOffset": @{
@@ -442,7 +455,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   // TODO RT:
   //scrollView.bounds = _webView.bounds;
   //RCTLogWarn(@"%zd, %zd, %zd", scrollView.contentInset.top, scrollView.contentInset.bottom, scrollView.contentSize.height);
-}
+}*/
 
 #pragma mark - WKNavigationDelegate methods
 
