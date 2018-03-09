@@ -87,6 +87,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
   }
   return self;
@@ -279,10 +280,19 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 {
   _keyboardShowing = true;
   CGRect screenRect = [[UIScreen mainScreen] bounds];
-  CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width,
-                            _keyboardShowing ? screenRect.size.height - _keyboardHeight : screenRect.size.height);
+  CGRect frame = CGRectMake(0, 0, 375, 400);
+  //CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, screenRect.size.height - _keyboardHeight);
   _webView.frame = frame;
-  _webView.bounds = frame;
+  //_webView.bounds = frame;
+}
+
+- (void)keyboardDidShow:(NSNotification *)notification
+{
+  _keyboardShowing = true;
+  CGRect screenRect = [[UIScreen mainScreen] bounds];
+  CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, screenRect.size.height - _keyboardHeight);
+  //_webView.frame = frame;
+  //_webView.bounds = frame;
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification
@@ -305,9 +315,9 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   // has all the desired behavior. Must be like.... when the keyboard shows,
   // and the WKWebView is big enough, it adds padding until the keyboard hides,
   // so changing the frame doesn't help?
-  //CGRect frame = CGRectMake(0, 0, 375, 433);
-  CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width,
-                            _keyboardShowing ? screenRect.size.height - _keyboardHeight : screenRect.size.height);
+  CGRect frame = CGRectMake(0, 0, 375, 400);
+  //CGRect frame = CGRectMake(0, 0, 375, screenRect.size.height - _keyboardHeight - 135);
+  //CGRect frame = CGRectMake(_webView.bounds.origin.x, _webView.bounds.origin.y, screenRect.size.width, _keyboardShowing ? screenRect.size.height - _keyboardHeight : screenRect.size.height);
 
   // Logically we just want frame...
   _webView.frame = frame;
