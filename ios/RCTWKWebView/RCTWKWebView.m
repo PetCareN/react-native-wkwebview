@@ -315,7 +315,9 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-  scrollView.contentOffset = _oldOffset;
+  if (_keyboardShowing) {
+    scrollView.contentOffset = _oldOffset;
+  }
 }
 
 
