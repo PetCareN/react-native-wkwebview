@@ -297,8 +297,32 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
   if (!_webView.scrollView.scrollEnabled) {
-    scrollView.contentOffset = _oldOffset;
+    scrollView.contentOffset = CGPointMake(0,0);
   }
+
+  NSDictionary *event = @{
+                          @"contentOffset": @{
+                              @"x": @(scrollView.contentOffset.x),
+                              @"y": @(scrollView.contentOffset.y)
+                              },
+                          @"contentInset": @{
+                              @"top": @(scrollView.contentInset.top),
+                              @"left": @(scrollView.contentInset.left),
+                              @"bottom": @(scrollView.contentInset.bottom),
+                              @"right": @(scrollView.contentInset.right)
+                              },
+                          @"contentSize": @{
+                              @"width": @(scrollView.contentSize.width),
+                              @"height": @(scrollView.contentSize.height)
+                              },
+                          @"layoutMeasurement": @{
+                              @"width": @(scrollView.frame.size.width),
+                              @"height": @(scrollView.frame.size.height)
+                              },
+                          @"zoomScale": @(scrollView.zoomScale ?: 1),
+                          };
+
+  _onScroll(event);
 }
 
 - (void)logSituation:(NSString *)context {
@@ -320,7 +344,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   } else {
     CGRect frame = CGRectMake(self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height - _keyboardHeight);
     _webView.frame = frame;
-    _webView.bounds = frame;
     //[self logSituation:@"setCustomLayout"];
   }
 }
@@ -385,37 +408,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   _webView.UIDelegate = nil;
   _webView.scrollView.delegate = nil;
 }
-
-/*- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
-  NSDictionary *event = @{
-                          @"contentOffset": @{
-                              @"x": @(scrollView.contentOffset.x),
-                              @"y": @(scrollView.contentOffset.y)
-                              },
-                          @"contentInset": @{
-                              @"top": @(scrollView.contentInset.top),
-                              @"left": @(scrollView.contentInset.left),
-                              @"bottom": @(scrollView.contentInset.bottom),
-                              @"right": @(scrollView.contentInset.right)
-                              },
-                          @"contentSize": @{
-                              @"width": @(scrollView.contentSize.width),
-                              @"height": @(scrollView.contentSize.height)
-                              },
-                          @"layoutMeasurement": @{
-                              @"width": @(scrollView.frame.size.width),
-                              @"height": @(scrollView.frame.size.height)
-                              },
-                          @"zoomScale": @(scrollView.zoomScale ?: 1),
-                          };
-
-  _onScroll(event);
-
-  // TODO RT:
-  //scrollView.bounds = _webView.bounds;
-  //RCTLogWarn(@"%zd, %zd, %zd", scrollView.contentInset.top, scrollView.contentInset.bottom, scrollView.contentSize.height);
-}*/
 
 #pragma mark - WKNavigationDelegate methods
 
