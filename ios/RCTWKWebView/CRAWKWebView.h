@@ -40,7 +40,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) CGFloat keyboardHeight;
 @property (nonatomic, assign) BOOL keyboardShowing;
 @property (nonatomic, assign) BOOL keyboardWillShow;
-@property (nonatomic, assign)id<RCTWKWebViewDelegate> oldScrollDelegate;
+@property (nonatomic, assign)id<CRAWKWebViewDelegate> oldScrollDelegate;
 @property (nonatomic, assign) BOOL keyboardDisplayRequiresUserAction;
 
 
