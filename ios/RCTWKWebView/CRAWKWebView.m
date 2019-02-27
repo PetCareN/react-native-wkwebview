@@ -563,6 +563,24 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   }
 }
 
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
+  // We sync the wkwebview's cookie store back into the NSHTTPCookieStorage.
+  // If you set sendCookies: true then these saved cookies willbe sent as well.
+  if (@available(iOS 11.0, *)) {
+    WKHTTPCookieStore *cookieStore = webView.configuration.websiteDataStore.httpCookieStore;
+    [cookieStore getAllCookies:^(NSArray* cookies) {
+      if (cookies.count > 0) {
+        for (NSHTTPCookie *cookie in cookies) {
+          NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+            [cookieStorage setCookie: cookie];
+          }
+      }
+    }];
+  }
+
+  decisionHandler(WKNavigationResponsePolicyAllow);
+}
+
 - (void)webView:(__unused WKWebView *)webView didFailProvisionalNavigation:(__unused WKNavigation *)navigation withError:(NSError *)error
 {
   if (_onLoadingError) {
